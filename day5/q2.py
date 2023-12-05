@@ -22,22 +22,32 @@ def handleTransition(seeds, currLine):
             seedLow = seed[0]
             seedHigh = seed[1]
             possibleRangeMax = sourceRange + rangeLength - 1
+
+            # if source range contains seed low and high
             if seedLow >= sourceRange and seedHigh <= possibleRangeMax:
                 newSeeds.append((seedLow + diff, seedHigh + diff))
                 if seedLow < sourceRange:
                     seedsToCheckNext.append((seedLow, sourceRange - 1))
                 if seedHigh > possibleRangeMax:
                     seedsToCheckNext.append((possibleRangeMax + 1, seedHigh))
+
+            # if seed low and high contains source range
             elif seedLow < sourceRange and seedHigh > possibleRangeMax:
                 newSeeds.append((sourceRange+diff, possibleRangeMax+diff))
                 seedsToCheckNext.append((seedLow, sourceRange - 1))
                 seedsToCheckNext.append((possibleRangeMax + 1, seedHigh))
+
+            # if seed low is contained in source and seed range goes higher than source
             elif seedLow >= sourceRange and seedLow <= possibleRangeMax and seedHigh >= possibleRangeMax:
                 newSeeds.append((seedLow + diff, possibleRangeMax + diff))
                 seedsToCheckNext.append((possibleRangeMax+1, seedHigh))
+
+            # if seed high is contained in source and seed range goes lower than source
             elif seedLow <= sourceRange and seedHigh >= sourceRange and seedHigh <= possibleRangeMax:
                 newSeeds.append((sourceRange + diff, seedHigh + diff))
                 seedsToCheckNext.append((seedLow, sourceRange - 1))
+
+            # if seed is not within source at all
             else:
                 seedsToCheckNext.append(seed)
         currLine += 1
