@@ -20,6 +20,7 @@ with open("input.txt", "r") as f:
         line = line.strip()
         line = [int(l) for l in line.split(" ")]
         rows = calcLineDifferences(line, [line, []], 1)
+
         oldVal = 0
         i = len(rows) - 2
         while i >= 0:
