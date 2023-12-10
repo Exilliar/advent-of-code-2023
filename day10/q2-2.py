@@ -1,3 +1,5 @@
+# faster implementation of q2
+
 pipes = {
     "|": ((0, -1), (0, 1)),
     "-": ((-1, 0), (1, 0)),
@@ -94,7 +96,6 @@ with open("input.txt", "r") as f:
         currentPipe = grid[currentY][currentX]
         coordsInLoop.append((oldX, oldY))
 
-    total = 0
     points = []
     if startPipeType != "|" and startPipeType != "-":
         points.append(startPos)
@@ -105,59 +106,48 @@ with open("input.txt", "r") as f:
 
     grid[startPos[1]][startPos[0]] = startPipeType
 
-    newGrid = []
-    for i, r in enumerate(grid):
-        newGrid.append([])
-        for c in r:
-            newGrid[i].append(c)
+    total = 0
 
-    # find if each point is contained in the polygon of the pipe network through ray casting https://en.wikipedia.org/wiki/Point_in_polygon
+    # find if each point is contained in the polygon of the pipe network through ray casting https://en.wikipedia.org/wiki/Point_in_polygon (but faster than in q2.py)
     for y, row in enumerate(grid):
-        print(y)
-        for x, square in enumerate(row):
+        x = 0
+        hitCount = 0
+        while x < len(row):
+            currVal = grid[y][x]
             if (x, y) not in coordsInLoop:
-                xCheck = x - 1
-                numHitLeft = 0
-                while xCheck >= 0:
-                    if (xCheck, y) in coordsInLoop:
-                        checkSquare = grid[y][xCheck]
-                        if (xCheck, y) in points:
-                            pointIndex = points.index((xCheck, y))
-                            point = points[pointIndex]
-                            pointLow = pointIndex - 1
-                            pointHigh = pointIndex + 1
-                            if pointHigh >= len(points):
-                                pointHigh = 0
+                if hitCount != 0 and hitCount % 2 != 0:
+                    total += 1
+                x += 1
+            else:
+                if currVal == "|":
+                    hitCount += 1
+                    x += 1
+                elif (x, y) in points:
+                    pointIndex = points.index((x, y))
+                    point = points[pointIndex]
+                    pointLow = pointIndex - 1
+                    pointHigh = pointIndex + 1
+                    if pointHigh >= len(points):
+                        pointHigh = 0
 
-                            pointCheck = None
-                            oldXCheck = xCheck
-                            if points[pointLow][1] == y:
-                                xCheck = points[pointLow][0] - 1
-                                pointCheck = points[pointLow]
-                            elif points[pointHigh][1] == y:
-                                xCheck = points[pointHigh][0] - 1
-                                pointCheck = points[pointHigh]
-                            if pointCheck:
-                                pointCheckType = grid[pointCheck[1]][pointCheck[0]]
-                                oldCheckXType = grid[y][oldXCheck]
-                                if pointCheckType == "F" and oldCheckXType == "J":
-                                    numHitLeft += 1
-                                elif pointCheckType == "J" and oldCheckXType == "F":
-                                    numHitLeft += 1
-                                elif pointCheckType == "L" and oldCheckXType == "7":
-                                    numHitLeft += 1
-                                elif pointCheckType == "7" and oldCheckXType == "L":
-                                    numHitLeft += 1
-                        else:
-                            numHitLeft += 1
-                            xCheck -= 1
-                    else:
-                        xCheck -= 1
-                if (numHitLeft % 2 != 0 and numHitLeft != 0):
-                    if newGrid[y][x] != "1":
-                        total += 1
-                    newGrid[y][x] = "1, " + str(numHitLeft)
-                else:
-                    newGrid[y][x] = "0, " + str(numHitLeft)
+                    pointCheck = None
+                    oldX = x
+                    if points[pointLow][1] == y:
+                        x = points[pointLow][0] + 1
+                        pointCheck = points[pointLow]
+                    elif points[pointHigh][1] == y:
+                        x = points[pointHigh][0] + 1
+                        pointCheck = points[pointHigh]
+                    if pointCheck:
+                        pointCheckType = grid[pointCheck[1]][pointCheck[0]]
+                        oldCheckXType = grid[y][oldX]
+                        if pointCheckType == "F" and oldCheckXType == "J":
+                            hitCount += 1
+                        elif pointCheckType == "J" and oldCheckXType == "F":
+                            hitCount += 1
+                        elif pointCheckType == "L" and oldCheckXType == "7":
+                            hitCount += 1
+                        elif pointCheckType == "7" and oldCheckXType == "L":
+                            hitCount += 1
 
     print("total: " + str(total))
