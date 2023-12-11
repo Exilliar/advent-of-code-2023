@@ -59,7 +59,6 @@ class Hand:
         elif\
             len(dict((k, v) for k, v in cardsDic.items() if v == 2)) == 1 and len(dict((k, v) for k, v in cardsDic.items() if v == 3)) == 1\
             or (len(dict((k, v) for k, v in cardsDic.items() if v == 2)) == 2 and numOfJ == 1):
-        # elif maxNum == 3:
             self.scoreName = "fh"
             return types["fh"]
         elif maxNum == 3:
