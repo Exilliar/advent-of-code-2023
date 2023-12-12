@@ -1,3 +1,5 @@
+import time
+
 def draw(number: int, remainingNumbers: list, newLines: list, newLinesPos: int, startPos: int, maxLength: int):
     newLine = newLines[newLinesPos]
     saveCurr = newLine.copy()
@@ -42,6 +44,7 @@ def validCheck(toCheck: list, line: list, numbersSum: int):
             return False
 
 with open("input.txt", "r") as f:
+    startTime = time.perf_counter()
     totaltotal = 0
     for line in f.readlines():
         line = line.strip()
@@ -52,15 +55,21 @@ with open("input.txt", "r") as f:
 
         draw(numbers[0], numbers[1:], newLines, 0, 0, len(field))
 
+        # print()
+        # print(line)
         for newLine in newLines:
             if len(newLine) < len(field):
                 while len(newLine) < len(field):
                     newLine.append(".")
+            # print(newLine)
         total = 0
         valids = []
         for line in newLines:
             if validCheck(line, field, sum(numbers)):
                 valids.append(line)
                 total += 1
+        # print(f"total: {total}")
         totaltotal += total
     print(totaltotal)
+    endTime = time.perf_counter()
+    print(f"time: {endTime - startTime}")
